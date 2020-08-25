@@ -28,39 +28,40 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 public class ReportService {
-@Autowired
-CarRepository carRepo;
-public String print(String format) throws JRException, IOException {
-	// make a dir in this classpath;
-	File filezz=new File("Report");
-	if(!filezz.exists())
-		filezz.mkdir();
-	
-	// Get a path//
-	String ppa= new File(".").getCanonicalPath();
-	SimpleDateFormat df=new SimpleDateFormat("yyyyMMddHHmm");
-	
-	String date=df.format(new Date());
-	
-	
-	String ff=ppa+"\\Report\\Car"+date+".html";
-	String fff=ppa+"\\Report\\Car"+date+".pdf";
-	//------------------//
-	List<Car>car=carRepo.findAll();
-	File file =ResourceUtils.getFile("classpath:Cars.jrxml");
-	JasperReport report=JasperCompileManager.compileReport(file.getAbsolutePath());
-	JRBeanCollectionDataSource source=new JRBeanCollectionDataSource(car);
-	Map<String,Object> parameters=new HashMap<>();
-	parameters.put("Created By", "LMH");
-	JasperPrint jasperPrint=JasperFillManager.fillReport(report, parameters,source);
-	if(format.equalsIgnoreCase("html")) {
-		JasperExportManager.exportReportToHtmlFile(jasperPrint,ff);
-	 return "Report Generated at"+ff;	
+	@Autowired
+	CarRepository carRepo;
+
+	public String print(String format) throws JRException, IOException {
+		// make a dir in this classpath;
+		File filezz = new File("Report");
+		if (!filezz.exists())
+			filezz.mkdir();
+
+		// Get a path//
+		String ppa = new File(".").getCanonicalPath();
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmm");
+
+		String date = df.format(new Date());
+
+		String ff = ppa + "\\Report\\Car" + date + ".html";
+		String fff = ppa + "\\Report\\Car" + date + ".pdf";
+
+		List<Car> car = carRepo.findAll();
+		File file = ResourceUtils.getFile("classpath:Cars.jrxml");
+		JasperReport report = JasperCompileManager.compileReport(file.getAbsolutePath());
+		JRBeanCollectionDataSource source = new JRBeanCollectionDataSource(car);
+		Map<String, Object> parameters = new HashMap<>();
+		parameters.put("Created By", "LMH");
+		JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, source);
+		if (format.equalsIgnoreCase("html")) {
+			JasperExportManager.exportReportToHtmlFile(jasperPrint, ff);
+			return "Report Generated at " + ff;
+			// ff mean path for html file
+		} else if (format.equalsIgnoreCase("Pdf")) {
+			JasperExportManager.exportReportToPdfFile(jasperPrint, fff);
+			return "Report Generated at " + fff;
+			/// fff mean path for pdf file
+		} else
+			return "Something wrong I can feel it";
 	}
-	else if(format.equalsIgnoreCase("Pdf")) {
-		JasperExportManager.exportReportToPdfFile(jasperPrint,fff);
-		return "Report Generated at"+fff;
-	}
-	else return "Something wrong I can feel it";
-}
 }
